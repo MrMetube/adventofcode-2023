@@ -4,18 +4,18 @@ import java.nio.file.Path;
 
 public class Advent {
     public static void main(String[] args) {
-        runDay(new Day01(),"Trebuchet?!");
-        runDay(new Day02(),"Cube Conundrum");
-        runDay(new Day03(),"Gear Ratios");
-        runDay(new Day04(),"Scratchcards");
-        // runDay(new Day05(),"If You Give A Seed A Fertilizer"); // TODO Part 2 Performance
-        runDay(new Day06(),"Wait For It");
-        runDay(new Day07(),"Camel Cards"); // TODO Part 2
-        runDay(new Day08(),"Haunted Wasteland");
-        runDay(new Day09(),"Mirage Maintenance");
-        runDay(new Day10(),"Pipe Maze");
-        runDay(new Day11(),"Cosmic Expansion");
-        // runDay(new Day12(),"");
+        // runDay(new Day01(),"Trebuchet?!");
+        // runDay(new Day02(),"Cube Conundrum");
+        // runDay(new Day03(),"Gear Ratios");
+        // runDay(new Day04(),"Scratchcards");
+        // // runDay(new Day05(),"If You Give A Seed A Fertilizer"); // TODO Part 2 Performance
+        // runDay(new Day06(),"Wait For It");
+        // runDay(new Day07(),"Camel Cards"); // TODO Part 2
+        // runDay(new Day08(),"Haunted Wasteland");
+        // runDay(new Day09(),"Mirage Maintenance");
+        // runDay(new Day10(),"Pipe Maze");
+        // runDay(new Day11(),"Cosmic Expansion");
+        runDay(new Day12(),"Hot Springs");
         // runDay(new Day13(),"");
         // runDay(new Day14(),"");
         // runDay(new Day15(),"");
