@@ -15,9 +15,9 @@ public class Advent {
         // runDay(new Day09(),"Mirage Maintenance");
         // runDay(new Day10(),"Pipe Maze");
         // runDay(new Day11(),"Cosmic Expansion");
-        runDay(new Day12(),"Hot Springs");
-        // runDay(new Day13(),"");
-        // runDay(new Day14(),"");
+        // // runDay(new Day12(),"Hot Springs"); // TODO unsolved
+        // runDay(new Day13(),"Point of Incidence");
+        runDay(new Day14(),"Parabolic Reflector Dish");
         // runDay(new Day15(),"");
         // runDay(new Day16(),"");
         // runDay(new Day17(),"");
