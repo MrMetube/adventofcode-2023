@@ -38,8 +38,8 @@ public class Advent {
             var in = Files.readAllLines(Path.of("./in/in"+num+".txt"));
             System.out.println("\n"+name+": "+title);
 			long part1 = day.part1(in);
-			long part2 = day.part2(in);
             System.out.printf("  Part 1: %,18d | %14d \n", part1, part1);
+			long part2 = day.part2(in);
             System.out.printf("  Part 2: %,18d | %14d \n", part2, part2);
         } catch (IOException e) {
             System.out.println("Please create the file "+e.getMessage());
