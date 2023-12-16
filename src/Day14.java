@@ -42,7 +42,6 @@ public class Day14 implements Day {
 			rollingStonesSouth();
 			rollingStonesEast();
 		}
-		System.out.println();
 
 		return getLoad();
 	}

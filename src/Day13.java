@@ -23,7 +23,6 @@ public class Day13 implements Day{
 
     @Override
     public long part2(List<String> lines) {
-		System.out.println();
 		List<List<String>> valleys = new ArrayList<>();
 		valleys.add(new ArrayList<>());
 		for (String cs : lines) {
