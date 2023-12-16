@@ -1,4 +1,3 @@
-import java.util.Arrays;
 import java.util.List;
 
 public class Day14 implements Day {
