@@ -1,108 +1,119 @@
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class Day16 implements Day{
 
     @Override
     public long part1(List<String> lines) {
-		Tile[][] contraption = lines.stream()
+		char[][] contraption = lines.stream()
 			.map(String::toCharArray)
-			.map(cs -> {
-				Tile[] ts = new Tile[cs.length];
-				for (int i = 0; i < cs.length; i++) ts[i] = Tile.of(cs[i]);
-				return ts;
-			})
-			.toArray(Tile[][]::new);
+			.toArray(char[][]::new);
 
 		List<Beam> beams = new ArrayList<>();
-		List<Beam> addedbeams = new ArrayList<>();
-		List<Beam> removedbeams = new ArrayList<>();
 		beams.add(new Beam(Dir.Right, 0, -1));
 
+		return energizeTiles(contraption, beams);
+    }
+
+    @Override
+    public long part2(List<String> lines) {
+        char[][] contraption = lines.stream()
+			.map(String::toCharArray)
+			.toArray(char[][]::new);
+
+		long max = 0;
+		List<Beam> beams = new ArrayList<>();
+
+		for(int row=0; row<contraption.length; row++){
+			beams.add(new Beam(Dir.Right, row, -1));
+			max = Math.max(max, energizeTiles(contraption, beams));
+		}
+		for(int row=0; row<contraption.length; row++){
+			beams.add(new Beam(Dir.Left, row, contraption[0].length));
+			max = Math.max(max, energizeTiles(contraption, beams));
+		}
+
+		for(int col=0; col<contraption[0].length; col++){
+			beams.add(new Beam(Dir.Down, -1, col));
+			max = Math.max(max, energizeTiles(contraption, beams));
+		}
+		for(int col=0; col<contraption[0].length; col++){
+			beams.add(new Beam(Dir.Up, contraption.length, col));
+			max = Math.max(max, energizeTiles(contraption, beams));
+		}
+
+		return max;
+    }
+
+	static long energizeTiles(char[][] contraption, List<Beam> beams){
+		List<Beam> toAdd = new ArrayList<>();
+		List<Beam> toRemove = new ArrayList<>();
 		Dir[][] energized = new Dir[contraption.length][contraption[0].length];
 
 		while (!beams.isEmpty()) {
 			for (Beam beam : beams) {
-				// step the beam
-				switch(beam.dir){
+				switch(beam.dir){ // step the beam
 					case Up 	->  beam.x -= 1;
 					case Right 	->  beam.y += 1;
 					case Down 	->  beam.x += 1;
 					case Left 	->  beam.y -= 1;
 				}
-				// remove outside beams
+				
 				boolean outOfBounds = beam.x < 0 || beam.x >= contraption.length || beam.y < 0 || beam.y >= contraption[0].length;
-				if( outOfBounds ) {
-					removedbeams.add(beam);
+				if( outOfBounds ) { // remove outside beams
+					toRemove.add(beam);
 					continue;
 				}
 				// interact with contraption
-				switch(contraption[beam.x][beam.y]){
-					case Empty -> {}
-					case MirrorRWDown -> {
-						beam.dir = switch(beam.dir){
-							case Up 	-> Dir.Left;
-							case Right 	-> Dir.Down;
-							case Down 	-> Dir.Right;
-							case Left 	-> Dir.Up;
-						};
+				beam.dir = switch(contraption[beam.x][beam.y]){
+					case '\\' -> switch(beam.dir){
+						case Right 	-> Dir.Down;
+						case Down 	-> Dir.Right;
+						case Left 	-> Dir.Up;
+						case Up 	-> Dir.Left;
+					};
+					case '/' -> switch(beam.dir){
+						case Right 	-> Dir.Up;
+						case Up 	-> Dir.Right;
+						case Left 	-> Dir.Down;
+						case Down 	-> Dir.Left;
+					};
+					case '-' -> { // split the beam
+						if(beam.dir != Dir.Down && beam.dir != Dir.Up) yield beam.dir;
+						
+						toAdd.add(new Beam(Dir.Right, beam.x, beam.y));
+						yield Dir.Left;
 					}
-					case MirrorRWUp -> {
-						beam.dir = switch(beam.dir){
-							case Up 	-> Dir.Right;
-							case Right 	-> Dir.Up;
-							case Down 	-> Dir.Left;
-							case Left 	-> Dir.Down;
-						};
-					}
-					case Horizontal -> {
-						if(beam.dir == Dir.Down || beam.dir == Dir.Up){ // split the beam
-							addedbeams.add(new Beam(Dir.Right, beam.x, beam.y));
-							beam.dir = Dir.Left;
-						}
-					}
-					case Vertical -> {
-						if(beam.dir == Dir.Right || beam.dir == Dir.Left){ // split the beam
-							addedbeams.add(new Beam(Dir.Up, beam.x, beam.y));
-							beam.dir = Dir.Down;
-						}
-					}
-				}
+					case '|' -> { // split the beam
+						if(beam.dir != Dir.Right && beam.dir != Dir.Left) yield beam.dir;
 
-				if(energized[beam.x][beam.y] != null && energized[beam.x][beam.y] == beam.dir){
-					if(beam.lastWasAlreadyEnegized) removedbeams.add(beam);
-					else beam.lastWasAlreadyEnegized = true;
-				}else{
-					beam.lastWasAlreadyEnegized = false;
-					energized[beam.x][beam.y] = beam.dir;
-				}
+						toAdd.add(new Beam(Dir.Up, beam.x, beam.y));
+						yield Dir.Down;
+					}
+					case '.' -> beam.dir;
+					default  -> beam.dir;
+				};
+
+				// was a beam already on this tile?
+				if(energized[beam.x][beam.y] == beam.dir) toRemove.add(beam);
+				else energized[beam.x][beam.y] = beam.dir;
 			}
-			beams.removeAll(removedbeams);
-			beams.addAll(addedbeams);
-			removedbeams.clear();
-			addedbeams.clear();
+
+			beams.removeAll(toRemove);
+			beams.addAll(toAdd);
+			toRemove.clear();
+			toAdd.clear();
 		}
 
-		long sum = 0;
-		for (int r = 0; r < energized.length; r++) {
-			for (int c = 0; c < energized[0].length; c++) {
-				sum += energized[r][c] != null ? 1 : 0;
-			}
-		}
+		return Arrays.stream(energized).mapToLong(row -> Arrays.stream(row).filter(c -> c != null).count()).sum();
+	}
 
-        return sum;
-    }
-
-    @Override
-    public long part2(List<String> lines) {
-        return 0;
-    }
-
-	class Beam{
+	static enum Dir{Up, Right, Down, Left}
+	static class Beam{
 		Dir dir;
 		int x;
 		int y;
-		boolean lastWasAlreadyEnegized = false;
 		public Beam(Dir dir, int x, int y) {
 			this.dir = dir;
 			this.x = x;
@@ -111,27 +122,4 @@ public class Day16 implements Day{
 		
 	}
 
-	enum Dir{
-		Up, Right, Down, Left;
-	}
-    
-
-	enum Tile{
-		Empty('.'),
-		Vertical('|'),
-		Horizontal('-'),
-		MirrorRWUp('/'),
-		MirrorRWDown('\\');
-		
-		char symbol;
-		Tile(char c){symbol = c;}
-
-		static Tile of(char symbol){
-			for (Tile t : Tile.values()) {
-				if(t.symbol == symbol) return t;
-			}
-			assert false : "Bad Symbol: " + symbol;
-			return null;
-		}
-	}
 }
