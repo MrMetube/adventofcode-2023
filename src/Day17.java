@@ -49,15 +49,15 @@ public class Day17 implements Day{
 				if(s.last == opposites[i]) continue;
 				if(s.count < minLength && s.last != dirs[i]) continue;
 
-				State copy = s;
+				State last = s;
 				for (int j = 1; j <= minLength; j++) {
 					int x = s.x+deltas[i][0]*j, y = s.y+deltas[i][1]*j;
 					if(y >= cols || y < 0 || x >= rows || x < 0) continue directions;
 					
-					State t = new State(x, y, copy, city[x][y], dirs[i]);
-					copy = t;
+					State t = new State(x, y, last, city[x][y], dirs[i]);
 					if(t.count > maxLength) continue directions;
-					if(checked.add(copy)) todo.add(copy);
+					if(checked.add(t)) todo.add(t);
+					last = t;
 				}
 			}
 		}
