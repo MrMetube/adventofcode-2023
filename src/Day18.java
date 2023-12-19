@@ -14,27 +14,7 @@ public class Day18 implements Day{
 			})
 			.toArray(Order[]::new);
 
-
-		// interior calculated with shoelace method
-		long shoelace = 0;
-		long border = 0;
-		int x = 0, y = 0, lastX = 0, lastY = 0;
-		for(Order order : orders){
-			switch(order.dir){
-				case U -> x-=order.len;
-				case D -> x+=order.len;
-				case L -> y-=order.len;
-				case R -> y+=order.len;
-			}
-			border   += order.len;
-			shoelace += x*lastY - lastX*y;
-			lastX = x;
-			lastY = y;
-		}
-		shoelace = Math.abs(shoelace)/2;
-		// add border, don't double count it though
-		border /= 2;
-		return shoelace + 1 + border;
+		return getShoelace(orders);
     }
 
     @Override
@@ -52,6 +32,10 @@ public class Day18 implements Day{
 			})
 			.toArray(Order[]::new);
 
+		return getShoelace(orders);
+    }
+
+	static long getShoelace(Order[] orders){
 		// interior calculated with shoelace method
 		long shoelace = 0;
 		long border = 0;
@@ -72,7 +56,7 @@ public class Day18 implements Day{
 		// add border, don't double count it though
 		border /= 2;
 		return shoelace + 1 + border;
-    }
+	}
 
 	static record Order(Dir dir, int len){}
     enum Dir{R,D,L,U}
