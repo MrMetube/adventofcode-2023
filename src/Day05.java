@@ -31,7 +31,7 @@ public class Day05 implements Day {
         }
         long min;
         {// map seeds over all maps
-            long[] seeds = Arrays.stream(lines.get(0).replace("seeds: ", "").trim().split(" ")).mapToLong(Long::parseLong).toArray();
+            long[] seeds = Arrays.stream(lines.getFirst().replace("seeds: ", "").trim().split(" ")).mapToLong(Long::parseLong).toArray();
             min = Arrays.stream(seeds).map(s -> {
                 with_next_map: for (var map : maps)
                     for (long[] range : map)
@@ -76,7 +76,7 @@ public class Day05 implements Day {
             almanac[mapIndex] = removeEmpties(currentMap, cursor);
         }
 
-		final long[] rawSeeds = Arrays.stream(lines.get(0).replace("seeds: ", "").trim().split(" ")).mapToLong(Long::parseLong).toArray();
+		final long[] rawSeeds = Arrays.stream(lines.getFirst().replace("seeds: ", "").trim().split(" ")).mapToLong(Long::parseLong).toArray();
 		final long[][] seeds = new long[rawSeeds.length/2][];
         // parse seeds into ranges
 		for (int i = 0; i < seeds.length; i++) {

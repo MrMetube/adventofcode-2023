@@ -7,7 +7,7 @@ public class Day03 implements Day {
     @Override
     public long part1(List<String> lines) {
         // pad edges with . to not join separate lines
-        final int width = lines.get(0).length()+1;
+        final int width = lines.getFirst().length()+1;
         var res = String.join(".", lines).toCharArray();
 
         // parse into Cell[]
@@ -64,7 +64,7 @@ public class Day03 implements Day {
     @Override
     public long part2(List<String> lines) {
         // pad edges with . to not join separate lines
-        final int width = lines.get(0).length()+1;
+        final int width = lines.getFirst().length()+1;
         var res = String.join(".", lines).toCharArray();
 
         // parse into Cell[]

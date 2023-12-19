@@ -1,6 +1,7 @@
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 public class Day16 implements Day{
 
@@ -91,8 +92,7 @@ public class Day16 implements Day{
 						toAdd.add(new Beam(Dir.Up, beam.x, beam.y));
 						yield Dir.Down;
 					}
-					case '.' -> beam.dir;
-					default  -> beam.dir;
+                    default  -> beam.dir;
 				};
 
 				// was a beam already on this tile?
@@ -106,10 +106,10 @@ public class Day16 implements Day{
 			toAdd.clear();
 		}
 
-		return Arrays.stream(energized).mapToLong(row -> Arrays.stream(row).filter(c -> c != null).count()).sum();
+		return Arrays.stream(energized).mapToLong(row -> Arrays.stream(row).filter(Objects::nonNull).count()).sum();
 	}
 
-	static enum Dir{Up, Right, Down, Left}
+	enum Dir{Up, Right, Down, Left}
 	static class Beam{
 		Dir dir;
 		int x;

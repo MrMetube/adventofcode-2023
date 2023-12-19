@@ -25,7 +25,7 @@ public class Day11 implements Day{
 			rowGaps = emptyRows.stream().mapToInt(i -> i).toArray();
 			// find empty columns
 			final List<Integer> emptyColumns = new ArrayList<>();
-			for (int col = 0; col < universe.get(0).length(); col++) {
+			for (int col = 0; col < universe.getFirst().length(); col++) {
 				boolean hasGalaxy = false;
 				for (String line : universe) hasGalaxy |= line.charAt(col) == '#';
 				if(!hasGalaxy) emptyColumns.add(col);
@@ -37,7 +37,7 @@ public class Day11 implements Day{
 		final List<int[]> galaxies = new ArrayList<>();
 		for (int i = 0; i < universe.size(); i++) {
 			var line = universe.get(i);
-			for (int j = 0; j < universe.get(0).length(); j++) if(line.charAt(j) == '#') galaxies.add(new int[]{i,j});
+			for (int j = 0; j < universe.getFirst().length(); j++) if(line.charAt(j) == '#') galaxies.add(new int[]{i,j});
 		}
 
 		// calculate manhatten distance for every galaxy pair

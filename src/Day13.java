@@ -8,7 +8,7 @@ public class Day13 implements Day{
 		List<List<String>> valleys = new ArrayList<>();
 		valleys.add(new ArrayList<>());
 		for (String cs : lines) {
-			if(cs.length()!=0) valleys.getLast().add(cs);
+			if(!cs.isEmpty()) valleys.getLast().add(cs);
 			else valleys.add(new ArrayList<>());
 		}
 
@@ -17,7 +17,7 @@ public class Day13 implements Day{
 			.map(valley -> valley.map(String::toCharArray))
 			.map(valley -> valley.toArray(char[][]::new))
 			.map(valley -> findRelections(valley, 0))
-			.mapToLong(valley -> valley.getFirst())
+			.mapToLong(List::getFirst)
 			.sum();
     }
 
@@ -26,7 +26,7 @@ public class Day13 implements Day{
 		List<List<String>> valleys = new ArrayList<>();
 		valleys.add(new ArrayList<>());
 		for (String cs : lines) {
-			if(cs.length()!=0) valleys.getLast().add(cs);
+			if(!cs.isEmpty()) valleys.getLast().add(cs);
 			else valleys.add(new ArrayList<>());
 		}
 

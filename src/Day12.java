@@ -101,7 +101,7 @@ public class Day12 implements Day {
 	}
 
 	private static String reduceOperationalSprings(String s) {
-		return s.replaceAll("\\.+", "\\.").replaceAll("^\\.", "").replaceAll("\\.$", "");
+		return s.replaceAll("\\.+", ".").replaceAll("^\\.", "").replaceAll("\\.$", "");
 	}
 
 	private static long nChooseK(long n, long k) {

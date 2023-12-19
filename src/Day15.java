@@ -70,7 +70,7 @@ public class Day15 implements Day{
 
 	
 
-	class Lens{
+	static class Lens{
 		String label = "";
 		int focalLength;
 		@Override public int hashCode() { return holidayAsciiStringHelper(label.toCharArray()); }

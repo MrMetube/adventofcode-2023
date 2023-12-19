@@ -32,11 +32,12 @@ public class Day10 implements Day{
 		while(!next.isEmpty()) markNeighbourghs(tiles, steps, next);
 		// Print the loop
 		long max = Long.MIN_VALUE;
-		
-		for (int r = 0; r < steps.length; r++) for (int c = 0; c < steps[0].length; c++) {
-			int s = steps[r][c];
-			max = s == Integer.MAX_VALUE ? max : Math.max(max, steps[r][c]);
-		}
+
+        for (int[] step : steps)
+            for (int c = 0; c < steps[0].length; c++) {
+                int s = step[c];
+                max = s == Integer.MAX_VALUE ? max : Math.max(max, step[c]);
+            }
 
         return max;
     }
@@ -52,13 +53,13 @@ public class Day10 implements Day{
 			int[] o = nextOptions[i];
 			int or = o[0], oc = o[1];
 			if(inBounds(or, oc, tiles) && p.flow(tiles[or][oc], nextDirs[i]))
-				mark(or, oc, tiles, steps, count).ifPresent(next::add);
+				mark(or, oc, steps, count).ifPresent(next::add);
 		}
 	}
 
 	static boolean inBounds(int r, int c, Pipe[][] tiles){ return r >= 0 && r < tiles.length && c >= 0 && c < tiles[0].length;}
 
-	static Optional<int[]> mark(int r, int c, Pipe[][] tiles, int[][] steps, int count){
+	static Optional<int[]> mark(int r, int c, int[][] steps, int count){
 		final int previous = steps[r][c];
 		steps[r][c] = Math.min(previous, count+1);
 		return previous >= count+1 ? Optional.of(new int[]{r,c}) : Optional.empty();
@@ -139,9 +140,9 @@ public class Day10 implements Day{
         return insideCount;
     }
     
-	static enum Dir{North, East, South, West}
+	enum Dir{North, East, South, West}
 
-	static enum Pipe{
+	enum Pipe{
 		Ground(' '),
 		Vertical('║'),
 		Horizontal('═'),
@@ -153,7 +154,7 @@ public class Day10 implements Day{
 		OutLoop('O'),
 		Start('#');
 
-		char sign;
+		final char sign;
 		Pipe(char sign){this.sign = sign;}
 
 		private boolean flowInto(Dir in){

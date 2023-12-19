@@ -6,7 +6,7 @@ public class Day08 implements Day {
 
 	@Override
 	public long part1(List<String> lines) {
-		int[] input = lines.get(0).chars().map(c -> c == 'L' ? 0 : 1).toArray();
+		int[] input = lines.getFirst().chars().map(c -> c == 'L' ? 0 : 1).toArray();
 
 		HashMap<String, String[]> map = new HashMap<>();
 
@@ -34,7 +34,7 @@ public class Day08 implements Day {
 
 	@Override
 	public long part2(List<String> lines) {
-		int[] input = lines.get(0).chars().map(c -> c == 'L' ? 0 : 1).toArray();
+		int[] input = lines.getFirst().chars().map(c -> c == 'L' ? 0 : 1).toArray();
 
 		// setup all nodes and positions
 		HashMap<String, String[]> map = new HashMap<>();
