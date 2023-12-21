@@ -21,8 +21,8 @@ public class Advent {
         //  runDay(new Day15(),"Lens Library");
         //  runDay(new Day16(),"The Floor Will Be Lava");
         // runDay(new Day17(),"Clumsy Crucible");
-        runDay(new Day18(),"Lavaduct Lagoon");
-        // runDay(new Day19(),"");
+        // runDay(new Day18(),"Lavaduct Lagoon");
+        runDay(new Day19(),"Aplenty");
         // runDay(new Day20(),"");
         // runDay(new Day21(),"");
         // runDay(new Day22(),"");
@@ -38,9 +38,9 @@ public class Advent {
             var in = Files.readAllLines(Path.of("./in/in"+num+".txt"));
             System.out.println("\n"+name+": "+title);
 			long part1 = day.part1(in);
-            System.out.printf("  Part 1: %,18d | %14d \n", part1, part1);
+            System.out.printf("  Part 1: %,20d | %16d \n", part1, part1);
 			long part2 = day.part2(in);
-            System.out.printf("  Part 2: %,18d | %14d \n", part2, part2);
+            System.out.printf("  Part 2: %,20d | %16d \n", part2, part2);
         } catch (IOException e) {
             System.out.println("Please create the file "+e.getMessage());
         }
