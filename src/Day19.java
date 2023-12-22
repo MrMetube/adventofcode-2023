@@ -14,17 +14,15 @@ public class Day19 implements Day {
 		for (String line : lines) {
 			if (!workflowsParsed && line.isEmpty()) {
 				workflowsParsed = true;
-				continue;
-			}
-			if (workflowsParsed) {
-				String[] lineParts = line.replaceAll("[\\{\\}]", "").split(",");
+			} else if (workflowsParsed) {
+				String[] lineParts = line.replaceAll("[{}]", "").split(",");
 				int[] values = new int[4];
 				for (int i = 0; i < lineParts.length; i++) {
 					String part = lineParts[i];
 					int value = Integer.parseInt(part.substring(2));
 					values[i] = value;
 				}
-				entries.add(new Part(values, "in"));
+				entries.add(new Part(values));
 			}
 		}
 
@@ -51,7 +49,7 @@ public class Day19 implements Day {
 		List<ComplexPart> accepted = new ArrayList<>();
 		List<ComplexPart> todo = new ArrayList<>();
 		todo.add(new ComplexPart());
-		
+
 		while(!todo.isEmpty()){
 			ComplexPart r = todo.removeFirst();
 			switch(r.target){
@@ -66,11 +64,16 @@ public class Day19 implements Day {
 		}
 
 		return accepted.stream()
-			.mapToLong(ComplexPart::value)
+			.mapToLong(p ->
+				Arrays.stream(Category.values())
+					.map(c -> p.xmas[c.ordinal()])
+					.mapToLong(r -> r[1]-r[0]+1)
+					.reduce(1, (v, vs) -> vs*v)
+			)
 			.sum();
 	}
 
-	static HashMap<String, Workflow> parseWorkflows(List<String> lines){
+	private static HashMap<String, Workflow> parseWorkflows(List<String> lines){
 		HashMap<String, Workflow> workflows = new HashMap<>();
 
 		for (String line : lines) {
@@ -87,39 +90,39 @@ public class Day19 implements Day {
 					break;
 				}
 
-				String[] ruleparts = rule.splitWithDelimiters("[\\<\\>:]", 0);
-				Category cat = Category.valueOf(ruleparts[0]);
-				Comparator comp = Comparator.of(ruleparts[1]);
-				int value = Integer.parseInt(ruleparts[2]);
-				String targetString = ruleparts[4];
-				w.add(new Rule(cat, comp, value, targetString));
+				String[] ruleParts = rule.splitWithDelimiters("[\\<\\>:]", 0);
+				Category cat = Category.valueOf(ruleParts[0]);
+				Comparator comp = Comparator.of(ruleParts[1]);
+				int value = Integer.parseInt(ruleParts[2]);
+				String target = ruleParts[4];
+				w.add(new Rule(cat, comp, value, target));
 			}
-			assert last != null : "default rule wasnt set";
+			assert last != null : "default rule wasn't set";
 			w.defaultTarget = last;
 			workflows.put(key, w);
 		}
 		return workflows;
 	}
 
-	static class Part {
-		int[] xmas;
+	private static class Part {
+		final int[] xmas;
 		String target;
 
-		Part(int[] x, String t) {
+		Part(int[] x) {
 			xmas = x;
-			target = t;
+			target = "in";
 		}
 	}
 
-	static class ComplexPart{
+	private static class ComplexPart{
 		long[][] xmas = new long[Category.values().length][2];
-		String target;
+		final String target;
 		ComplexPart(){
 			Arrays.fill(xmas, new long[]{1,4000});
 			target = "in";
 		}
 
-		ComplexPart(ComplexPart p, Category cat, long lower,  long upper, String target){
+		ComplexPart(ComplexPart p, Category cat, long lower, long upper, String target){
 			for (Category c : Category.values())
 				xmas[c.ordinal()] = c == cat ? new long[]{lower, upper} : new long[]{p.c(c)[0], p.c(c)[1]};
 			this.target = target;
@@ -135,32 +138,19 @@ public class Day19 implements Day {
 			this.target = target;
 		}
 
-		long[] c(Category c) { return xmas[c.ordinal()]; }
+		private long[] c(Category c) { return xmas[c.ordinal()]; }
 
-		long[] x() { return xmas[Category.x.ordinal()]; }
-		long[] m() { return xmas[Category.m.ordinal()]; }
-		long[] a() { return xmas[Category.a.ordinal()]; }
-		long[] s() { return xmas[Category.s.ordinal()]; }
+		private long[] x() { return xmas[Category.x.ordinal()]; }
+		private long[] m() { return xmas[Category.m.ordinal()]; }
+		private long[] a() { return xmas[Category.a.ordinal()]; }
+		private long[] s() { return xmas[Category.s.ordinal()]; }
 
-		long value(){
-			long value = 1;
-			for (Category c : Category.values()) {
-				long[] range = xmas[c.ordinal()];
-				long len = range[1] - range[0] + 1;
-				value *= len;
-			}
-			return value;
-		}
-
-		@Override
-		public String toString() {
-			return String.format("[x:[%4d:%4d], m:[%4d:%4d], a:[%4d:%4d], s:[%4d:%4d]] -> %s", x()[0], x()[1], m()[0], m()[1], a()[0], a()[1], s()[0], s()[1], target);
-		}
+		@Override public String toString() { return String.format("[x:[%4d:%4d], m:[%4d:%4d], a:[%4d:%4d], s:[%4d:%4d]] -> %s", x()[0], x()[1], m()[0], m()[1], a()[0], a()[1], s()[0], s()[1], target); }
 	}
 
-	enum Category {x, m, a, s}
+	private enum Category {x, m, a, s}
 
-	enum Comparator {
+	private enum Comparator {
 		GreaterThan, LessThan;
 
 		static Comparator of(String s) {
@@ -179,8 +169,8 @@ public class Day19 implements Day {
 		}
 	}
 
-	static record Rule(Category cat, Comparator comp, int value, String target) {
-		public String  toString(){ return "%s %s %d -> %s".formatted(cat, comp, value, target); }
+	private record Rule(Category cat, Comparator comp, int value, String target) {
+		public String toString(){ return "%s %s %d -> %s".formatted(cat, comp, value, target); }
 
 		boolean apply(int[] part) {
 			return switch (comp) {

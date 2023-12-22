@@ -8,11 +8,11 @@ public class Advent {
 	static List<List<String>> inputs;
 	static {
 		try {
-			inputs = new ArrayList<List<String>>();
+			inputs = new ArrayList<>();
 			for (int i = 0; i < 25; i++) {
 				String day = "%02d".formatted(i+1);
 				var in = Files.readAllLines(Path.of("./in/in"+day+".txt"));
-				assert inputs.add(in);
+				inputs.add(in);
 			}
 		} catch (IOException e) {
             System.out.println("Please create the file "+e.getMessage());
@@ -38,7 +38,7 @@ public class Advent {
 		// runDay(new Day16(),"The Floor Will Be Lava");
         // runDay(new Day17(),"Clumsy Crucible");
         // runDay(new Day18(),"Lavaduct Lagoon");
-        // runDay(new Day19(),"Aplenty");
+		runDay(new Day19(),"Aplenty");
         // runDay(new Day20(),"");
         // runDay(new Day21(),"");
         // runDay(new Day22(),"");
