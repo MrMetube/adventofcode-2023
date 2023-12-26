@@ -1,5 +1,4 @@
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -11,7 +10,7 @@ public class Day20 implements Day{
     public long part1(List<String> lines) {
         HashMap<String, Module> modules = parseModules(lines);
 
-		final Module button = new Module(Type.Button, "button", new String[]{"roadcaster"});
+		final Module button = new Module(Type.Button, "button", new String[]{"broadcaster"});
 		boolean done = false;
 		int presses = 0;
 		int[] count = {0,0};
@@ -35,14 +34,19 @@ public class Day20 implements Day{
 					}
 					case Conjunction -> {
 						current.inputs.put(previous, pulse);
-						out = current.inputs.values().stream().allMatch(p -> p) ? false : true;
+						boolean inverse = true;
+						for (boolean memory : current.inputs.values()) {
+							inverse &= memory;
+							if(!memory) break;
+						}
+						out = !inverse;
 					}
 				}
 				for (String t : current.targets) {
 					Module m = modules.get(t);
-					if(m.type != Type.Output) todo.add(new Entry(m, out, current));
+					if(m.type != Type.Output && !(m.type == Type.FlipFlop && out)) todo.add(new Entry(m, out, current));
 				}
-				count[out ? 1 : 0]+=current.targets.size();
+				count[out ? 1 : 0] += current.targets.size();
 			}
 			presses++;
 			done = true;
@@ -67,7 +71,7 @@ public class Day20 implements Day{
     public long part2(List<String> lines) {
         HashMap<String, Module> modules = parseModules(lines);
 
-		final Module button = new Module(Type.Button, "button", new String[]{"roadcaster"});
+		final Module button = new Module(Type.Button, "button", new String[]{"broadcaster"});
 		boolean done = false;
 		int presses = 0;
 		int[] count = {0,0};
@@ -91,19 +95,23 @@ public class Day20 implements Day{
 					}
 					case Conjunction -> {
 						current.inputs.put(previous, pulse);
-						out = current.inputs.values().stream().allMatch(p -> p) ? false : true;
+						boolean inverse = true;
+						for (boolean memory : current.inputs.values()) {
+							inverse &= memory;
+							if(!memory) break;
+						}
+						out = !inverse;
 					}
 				}
 				for (String t : current.targets) {
 					Module m = modules.get(t);
-					if(out == false && m.name == "rx") 
-						done = true;
-					if(m.type != Type.Output) todo.add(new Entry(m, out, current));
+					if(out == false && m.name == "rx") done = true;
+					if(m.type != Type.Output && !(m.type == Type.FlipFlop && out)) todo.add(new Entry(m, out, current));
 				}
 				count[out ? 1 : 0]+=current.targets.size();
 			}
 			presses++;
-			if(presses % 10000 == 0)
+			if(presses % 100000 == 0)
 				System.out.printf("               \r%,d",presses);
 		}while(!done);
 
@@ -121,7 +129,10 @@ public class Day20 implements Day{
 			Type type = switch(t){
 				case '%' -> Type.FlipFlop;
 				case '&' -> Type.Conjunction;
-				case 'b' -> Type.Broadcast;
+				case 'b' -> {
+					name = "broadcaster";
+					yield Type.Broadcast;
+				}
 				default -> throw new Error("Bad sign: "+t);
 			};
 			return new Module(type, name, targets);
