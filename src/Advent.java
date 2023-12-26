@@ -38,8 +38,8 @@ public class Advent {
 		// runDay(new Day16(),"The Floor Will Be Lava");
         // runDay(new Day17(),"Clumsy Crucible");
         // runDay(new Day18(),"Lavaduct Lagoon");
-		runDay(new Day19(),"Aplenty");
-        // runDay(new Day20(),"");
+		// runDay(new Day19(),"Aplenty");
+        runDay(new Day20(),"Pulse Propagation");
         // runDay(new Day21(),"");
         // runDay(new Day22(),"");
         // runDay(new Day23(),"");
