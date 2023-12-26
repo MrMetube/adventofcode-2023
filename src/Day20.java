@@ -1,158 +1,181 @@
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.stream.Collectors;
+import java.util.*;
 
 public class Day20 implements Day{
 
     @Override
     public long part1(List<String> lines) {
-        HashMap<String, Module> modules = parseModules(lines);
-
-		final Module button = new Module(Type.Button, "button", new String[]{"broadcaster"});
-		boolean done = false;
-		int presses = 0;
+		var modules = parseModules(lines);
+        Module button = modules.get("button");
 		int[] count = {0,0};
-		List<Entry> todo = new LinkedList<>();
+		int index, back;
+		Module[] todoModules  = new Module[16];
+		boolean[] todoPulse   = new boolean[todoModules.length];
+		Module[] todoPrevious = new Module[todoModules.length];
 
+		int presses = 0;
+		boolean done;
 		do{
-			todo.add(new Entry(button, false, null));
-			while(!todo.isEmpty()){
-				Entry e = todo.removeFirst();
-				Module current = e.target;
-				Module previous = e.previous;
-				boolean pulse = e.pulse;
-				boolean out = false;
-				switch(current.type){
-					case Button, Broadcast, Output -> out = false;
-					case FlipFlop -> {
-						if(pulse) continue;
+			index = 0;
+			back  = 0;
+			todoModules[0]  = button;
+			todoPulse[0]    = false;
+			todoPrevious[0] = null;
 
-						out = current.isOff;
+			Module current, previous;
+			boolean pulse;
+			while((current  = todoModules[index]) != null) {
+				previous = todoPrevious[index];
+				pulse   = todoPulse[index];
+
+				if(current.type == Type.FlipFlop && pulse) continue;
+				boolean out = switch (current.type) {
+					case FlipFlop -> {
 						current.isOff = !current.isOff;
+						yield !current.isOff;
 					}
 					case Conjunction -> {
-						current.inputs.put(previous, pulse);
-						boolean inverse = true;
-						for (boolean memory : current.inputs.values()) {
-							inverse &= memory;
-							if(!memory) break;
-						}
-						out = !inverse;
+						current.inputs.replace(previous, pulse);
+						yield !pulse || current.inputs.containsValue(false);
 					}
-				}
-				for (String t : current.targets) {
-					Module m = modules.get(t);
-					if(m.type != Type.Output && !(m.type == Type.FlipFlop && out)) todo.add(new Entry(m, out, current));
-				}
-				count[out ? 1 : 0] += current.targets.size();
+					default -> false;
+				};
+				todoModules[index] = null;
+				index = (index + 1) % todoModules.length;
+
+				for (Module m : current.targets)
+					if (m.type != Type.Output && !(out && m.type == Type.FlipFlop))
+						back = insertTodo(todoModules, todoPulse, todoPrevious, back, m, out, current);
+
+				count[out ? 1 : 0] += current.targets.length;
 			}
 			presses++;
 			done = true;
 			for(Module module : modules.values()){
-				switch(module.type){
-					case FlipFlop -> done &= module.isOff;
-					case Conjunction -> {
-						for (boolean p : module.inputs.values()) done &= p == false;
-					}
-					default -> {}
-				}
+				done &= switch(module.type){
+					case FlipFlop    -> module.isOff;
+					case Conjunction -> module.inputs.containsValue(true);
+					default -> true;
+				};
 			}
 		}while(!done && presses < 1000);
 
-		int factor = 1000 / presses;
+		long factor = 1000L / presses;
         return count[0]*factor * count[1]*factor;
     }
 
-	record Entry(Module target, boolean pulse, Module previous){}
-
     @Override
     public long part2(List<String> lines) {
-        HashMap<String, Module> modules = parseModules(lines);
+		var modules = parseModules(lines);
+        Module button = modules.get("button");
 
-		final Module button = new Module(Type.Button, "button", new String[]{"broadcaster"});
 		boolean done = false;
 		int presses = 0;
-		int[] count = {0,0};
-		List<Entry> todo = new LinkedList<>();
+		int index, back;
+		Module[] todoModules  = new Module[16];
+		boolean[] todoPulse   = new boolean[todoModules.length];
+		Module[] todoPrevious = new Module[todoModules.length];
 
 		do{
-			todo.add(new Entry(button, false, null));
-			while(!todo.isEmpty()){
-				Entry e = todo.removeFirst();
-				Module current = e.target;
-				Module previous = e.previous;
-				boolean pulse = e.pulse;
-				boolean out = false;
-				switch(current.type){
-					case Button, Broadcast, Output -> out = false;
-					case FlipFlop -> {
-						if(pulse) continue;
+			index = 0;
+			back  = 0;
+			todoModules[0]  = button;
+			todoPulse[0]    = false;
+			todoPrevious[0] = null;
 
-						out = current.isOff;
+			Module current, previous;
+			boolean pulse;
+			while((current  = todoModules[index]) != null) {
+				previous = todoPrevious[index];
+				pulse    = todoPulse[index];
+
+				if(current.type == Type.FlipFlop && pulse) continue;
+				boolean out = switch (current.type) {
+					case FlipFlop -> {
 						current.isOff = !current.isOff;
+						yield !current.isOff;
 					}
 					case Conjunction -> {
-						current.inputs.put(previous, pulse);
-						boolean inverse = true;
-						for (boolean memory : current.inputs.values()) {
-							inverse &= memory;
-							if(!memory) break;
-						}
-						out = !inverse;
+						current.inputs.replace(previous, pulse);
+						yield !pulse || current.inputs.containsValue(false);
 					}
+					default -> false;
+				};
+				todoModules[index] = null;
+
+				for (Module m : current.targets) {
+					done = !out && "rx".equals(m.name);
+					if(m.type != Type.Output && !(out && m.type == Type.FlipFlop))
+						back = insertTodo(todoModules, todoPulse, todoPrevious, back, m, out, current);
 				}
-				for (String t : current.targets) {
-					Module m = modules.get(t);
-					if(out == false && m.name == "rx") done = true;
-					if(m.type != Type.Output && !(m.type == Type.FlipFlop && out)) todo.add(new Entry(m, out, current));
-				}
-				count[out ? 1 : 0]+=current.targets.size();
+				index = (index + 1) % todoModules.length;
 			}
 			presses++;
-			if(presses % 100000 == 0)
-				System.out.printf("               \r%,d",presses);
+
+			if(presses % 100_000 == 0) System.out.printf("               \r  %,d",presses);
 		}while(!done);
 
         return presses;
     }
 
+	private static int insertTodo(Module[] todoModules, boolean[] todoPulses, Module[] todoPrevious, int back, Module next, boolean out, Module current){
+		back = (back + 1) % todoModules.length;
+		todoModules[back]  = next;
+		todoPulses[back]    = out;
+		todoPrevious[back] = current;
+		return back;
+	}
+
 	private static HashMap<String, Module> parseModules(List<String> lines){
-		HashMap<String, Module> modules;
 		List<Module> moduleList = lines.stream()
-		.map(l -> {
-			String[] parts = l.split(" -> ");
-			var t = parts[0].charAt(0);
-			var name = parts[0].substring(1);
-			var targets = parts[1].split(", ");
-			Type type = switch(t){
-				case '%' -> Type.FlipFlop;
-				case '&' -> Type.Conjunction;
-				case 'b' -> {
-					name = "broadcaster";
-					yield Type.Broadcast;
-				}
-				default -> throw new Error("Bad sign: "+t);
-			};
-			return new Module(type, name, targets);
-		})
-		.collect(Collectors.toList());
-	
-		modules = new HashMap<>(moduleList.size());
+			.map(l -> {
+				String[] parts = l.split(" -> ");
+				var t = parts[0].charAt(0);
+				var name = parts[0].substring(1);
+				var targets = parts[1].split(", ");
+				Type type = switch(t){
+					case '%' -> Type.FlipFlop;
+					case '&' -> Type.Conjunction;
+					case 'b' -> {
+						name = "broadcaster";
+						yield Type.Broadcast;
+					}
+					default -> throw new Error("Bad sign: "+t);
+				};
+				return new Module(type, name, targets);
+			})
+			.toList();
+		
+		HashMap<String, Module> modules = new HashMap<>(moduleList.size());
 		// add all modules
-		for (Module module : moduleList) modules.put(module.name, module);
+		for (Module module : moduleList)
+			modules.put(module.name, module);
+		
+		Module button = new Module(Type.Button, "button", "broadcaster");
+		modules.put("button", button);
+			
 		// add all outputs
-		for (Module module : moduleList) for (String target : module.targets) modules.putIfAbsent(target, new Module(Type.Output, target, new String[0]));
+		for (Module module : moduleList) 
+			for (String target : module.targetNames)
+				modules.putIfAbsent(target, new Module(Type.Output, target));
 		// initialize all conjunctions
 		for (Module module : modules.values())
 			if(module.type == Type.Conjunction){
-				var ins = modules.values()
+				modules.values()
 					.stream()
-					.filter(m -> m.targets.contains(module.name))
-					.toList();
-				for (Module mm : ins) module.inputs.put(mm, false);
+					.filter(m -> m.targetNames != null)
+					.filter(m -> m.targetNames.contains(module.name))
+					.forEach(mm -> module.inputs.put(mm, false));
 			}
+		// initialize targets
+		for(Module module : modules.values()){
+			if(module.targetNames != null){
+				module.targets = new Module[module.targetNames.size()];
+				for (int i = 0; i < module.targetNames.size(); i++) {
+					module.targets[i] = modules.get(module.targetNames.get(i));
+				}
+			}
+			module.targetNames = null;
+		}
 		
 		return modules;
 	}
@@ -162,15 +185,37 @@ public class Day20 implements Day{
 	static class Module{
 		final Type type;
 		final String name;
-		final List<String> targets;
-		boolean isOff = true;
-		HashMap<Module,Boolean> inputs = new HashMap<>();
+		List<String> targetNames;
+		Module[] targets;
 
-		public Module(Type type, String name, String[] targets) {
+		boolean isOff = true;
+		HashMap<Module,Boolean> inputs;
+
+		public Module(Type type, String name) {
 			this.type = type;
 			this.name = name;
-			this.targets = new ArrayList<>();
-			for (String target : targets) this.targets.add(target);
+		}
+
+		public Module(Type type, String name, String... targets) {
+			this.type = type;
+			this.name = name;
+			this.targetNames = new ArrayList<>();
+			this.targetNames.addAll(Arrays.asList(targets));
+			if(type == Type.Conjunction) inputs = new HashMap<>();
+		}
+
+		@Override
+		public int hashCode() {
+			return name.hashCode();
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if(this == obj) return true;
+			return switch(obj){
+				case Module other -> name.equals(other.name);
+				default -> false;
+			};
 		}
 	}
 }

@@ -48,11 +48,9 @@ public class Advent {
     }
 
     static void runDay(Day day, String title) {
-		String name = day.getClass().getSimpleName();
-		String num = name.substring("Day".length());
-		int n = Integer.parseInt(num);
+		int n = Integer.parseInt(day.getClass().getSimpleName().substring("Day".length()));
 		var in = inputs.get(n-1);
-		System.out.println("\n"+name+": "+title);
+		System.out.printf("\nDay %d: %s\n", n, title);
 		long part1 = day.part1(in);
 		System.out.printf("  Part 1: %,20d | %16d \n", part1, part1);
 		long part2 = day.part2(in);
