@@ -39,10 +39,10 @@ public class Advent {
         // runDay(new Day17(),"Clumsy Crucible");
         // runDay(new Day18(),"Lavaduct Lagoon");
 		// runDay(new Day19(),"Aplenty");
-        runDay(new Day20(),"Pulse Propagation");
-        // runDay(new Day21(),"");
-        // runDay(new Day22(),"");
-        // runDay(new Day23(),"");
+        // runDay(new Day20(),"Pulse Propagation"); // TODO Part 2
+        // runDay(new Day21(),"Step Counter"); // TODO Part 2
+        // runDay(new Day22(),"Sand Slabs"); // TODO
+        runDay(new Day23(),"A Long Walk");
         // runDay(new Day24(),"");
         // runDay(new Day25(),"");
     }
